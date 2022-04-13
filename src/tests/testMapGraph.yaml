@@ -1,28 +1,33 @@
 Wishka:
   Marman:
-    100
+    5.
   Tetrov:
-    50
+    35.
   Irmoupolis:
-    30
+    10.
 Marman:
-  Wishka:
-    90
-  Tetrov:
-    40
-  Irmoupolis:
-    50
+  Gwangjang:
+    20.
+  Panju:
+    10.
 Tetrov:
-  Wishka:
-    50
-  Marman:
-    30
-  Irmoupolis:
-    60
+  Murat:
+    5.
+  Larti:
+    50.
+  Ziouxuan:
+    2.
 Irmoupolis:
-  Wishka:
-    30
-  Marman:
-    60
-  Tetrov:
-    70
+  Ziouxuan:
+    5.
+Gwangjang:
+  Etrios:
+    20.
+Panju:
+  Etrios:
+    15.
+Murat:
+  Etrios:
+    30.
+  Larti:
+    10.
