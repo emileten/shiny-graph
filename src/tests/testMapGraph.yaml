@@ -1,0 +1,28 @@
+Wishka:
+  Marman:
+    100
+  Tetrov:
+    50
+  Irmoupolis:
+    30
+Marman:
+  Wishka:
+    90
+  Tetrov:
+    40
+  Irmoupolis:
+    50
+Tetrov:
+  Wishka:
+    50
+  Marman:
+    30
+  Irmoupolis:
+    60
+Irmoupolis:
+  Wishka:
+    30
+  Marman:
+    60
+  Tetrov:
+    70
