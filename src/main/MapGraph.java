@@ -1,11 +1,11 @@
 package main;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -28,8 +28,9 @@ public class MapGraph {
 	public ConcreteGraph<String, Double> concreteGraphMap;
 	
 	/*
-	 * TODO not sure how this handles empty entries in the yaml (cities not connected to any other city
 	 * @param filePath absolute path to yaml file representing this graph
+	 * Must specify isolated nodes as empty entries in the yaml file. Will result 
+	 * in nodes without children or parents in the graph. 
 	 */
 	public MapGraph(String filePath) {
 		
@@ -42,9 +43,11 @@ public class MapGraph {
 				if (!this.concreteGraphMap.listNodes().contains(node.getKey())) {
 					this.concreteGraphMap.addNode(node.getKey());									
 				}
-				for (Map.Entry<String, Double> path: node.getValue().entrySet()) {	
-					this.concreteGraphMap.addEdge(path.getKey(), node.getKey(), path.getValue());
-				}	
+				if(node.getValue()!=null) { // if null, means it's an empty entry.
+					for (Map.Entry<String, Double> path: node.getValue().entrySet()) {	
+						this.concreteGraphMap.addEdge(path.getKey(), node.getKey(), path.getValue());
+					}						
+				}
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found ! " + filePath);
@@ -69,7 +72,8 @@ public class MapGraph {
 		
 		// initialize : current node is start node, and add a path start -> start (0 distance) to the queue. 
 		MapPath startToItselfMapPath = new MapPath();
-		startToItselfMapPath.addEdge(new MapEdge(startNode, startNode, 0.));
+		MapEdge firstEdge = new MapEdge(startNode, startNode, 0.);
+		startToItselfMapPath.addEdge(firstEdge);
 		pathPriorityQueue.add(startToItselfMapPath);
 		
 		
@@ -80,6 +84,7 @@ public class MapGraph {
 			
 			
 			if(bestPathDestinationNode.equals(targetNode)) {
+				bestMapPath.removeEdge(firstEdge);
 				return bestMapPath;
 			}
 			
@@ -138,6 +143,23 @@ public class MapGraph {
 			return Double.valueOf(this.distance);
 		}
 		
+		@Override
+		public boolean equals(Object other) {
+			if (other == null) {
+				return false;
+			}
+	        if (other.getClass() != this.getClass()) {
+	            return false;
+	        }	
+	        final MapEdge otherSame = (MapEdge) other;
+			return this.start==otherSame.start && this.end==otherSame.end && this.distance == otherSame.distance;
+		}
+		
+		@Override
+		public int hashCode() {
+			return (this.start.toString() + this.end.toString() + this.distance.toString()).hashCode();
+		}
+		
 	}
 	
 	/*
@@ -170,6 +192,10 @@ public class MapGraph {
 		public void addEdge(MapEdge edge){
 			this.edges.add(edge);
 			this.totalDistance = this.totalDistance + edge.getDistance();
+		}
+		
+		public void removeEdge(MapEdge edge) {
+			this.edges.remove(edge);
 		}
 		
 		/*
@@ -210,16 +236,20 @@ public class MapGraph {
 		 * edges insertion.
 		 * 
 		 */
-		public LinkedHashSet<String> pathSteps(){
+		public List<String> pathSteps(){
 			if (this.edges.isEmpty()) {
 				throw new RuntimeException("empty path");
 			}
-			LinkedHashSet<String> pathNodes = new LinkedHashSet<String>();
+			List<String> pathNodes = new ArrayList<String>();
 			for (MapEdge edge: this.edges) {
 				pathNodes.add(edge.start);
 			}
 			pathNodes.add(this.endNode());
 			return pathNodes;
+		}
+		
+		public boolean isEmpty() {
+			return this.edges.isEmpty();
 		}
 		
 	}

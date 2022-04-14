@@ -2,13 +2,13 @@ package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashSet;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import main.MapGraph;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -18,7 +18,11 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 class MapGraphTest {
 
 	public MapGraph thisGraph;
-	public String yamlFileString = "/Users/emile/Documents/shiny-graph/src/tests/testMapGraph.yaml";
+	public MapGraph brokenGraph;
+	public String yamlFileString = "/Users/emile/Documents/shiny-graph/src/tests/testMapGraph.yaml";	
+	public String yamlFileStringIsolatedNode = "/Users/emile/Documents/shiny-graph/src/tests/testMapGraphBrokenPath.yaml";	
+	public List<String> expectedShortestPathSteps = Arrays.asList("Wishka", "Irmoupolis", "Ziouxuan", "Tetrov", "Murat", "Larti");
+	public Double expectedShortestPathCost = 33.;
 	public String exampleEdgeStartString = "start";
 	public String exampleEdgeEndString = "end";
 	public String exampleEdgeEndString2 = "other node end";
@@ -30,7 +34,7 @@ class MapGraphTest {
 	@BeforeAll
 	void setUpBeforeClass() throws Exception {
 		thisGraph = new MapGraph("/Users/emile/Documents/shiny-graph/src/tests/testMapGraph.yaml");
-		
+		brokenGraph = new MapGraph("/Users/emile/Documents/shiny-graph/src/tests/testMapGraphBrokenPath.yaml");	
 	}
 
 	@BeforeEach
@@ -42,14 +46,19 @@ class MapGraphTest {
 	}
 	
 	@Test
-	void testConstructor() {
-		
+	void testConstructor() {		
 		assertTrue(thisGraph.concreteGraphMap.listNodes().contains("Tetrov"));
 		assertTrue(thisGraph.concreteGraphMap.listNodes().contains("Wishka"));
 		assertTrue(thisGraph.concreteGraphMap.listChildren("Tetrov").containsKey("Ziouxuan"));
 		assertTrue(!thisGraph.concreteGraphMap.listChildren("Tetrov").containsKey("Wishka"));
 		assertTrue(thisGraph.concreteGraphMap.listChildren("Tetrov").get("Larti").contains(50.));
-
+	}
+	
+	@Test
+	void testConstructorIsolatedNode() {	
+		assertTrue(brokenGraph.concreteGraphMap.listNodes().contains("Larti"));
+		assertTrue(brokenGraph.concreteGraphMap.listChildren("Larti").isEmpty());
+		assertTrue(brokenGraph.concreteGraphMap.listParents("Larti").isEmpty());
 	}
 
 	@Test
@@ -58,6 +67,13 @@ class MapGraphTest {
 		assertTrue(thisEdge.getStart().equals(exampleEdgeStartString));
 		assertTrue(thisEdge.getEnd().equals(exampleEdgeEndString));
 		assertTrue(thisEdge.getDistance().equals(exampleEdgeDistanceDouble));
+	}
+	
+	@Test
+	void testMapEdgeEquals() {
+		assertEquals(
+				new MapGraph.MapEdge(exampleEdgeStartString, exampleEdgeEndString, exampleEdgeDistanceDouble),
+				new MapGraph.MapEdge(exampleEdgeStartString, exampleEdgeEndString, exampleEdgeDistanceDouble));				
 	}
 	
 	@Test
@@ -76,24 +92,32 @@ class MapGraphTest {
 	
 	@Test 
 	void testPathSteps() {	
-		System.out.println(this.exampleDoubleEdgePath.pathSteps());
 		assertEquals(3, this.exampleDoubleEdgePath.pathSteps().size());
-		assertTrue(this.exampleDoubleEdgePath.pathSteps().contains(exampleEdgeStartString));
-		assertTrue(this.exampleDoubleEdgePath.pathSteps().contains(exampleEdgeEndString));
-		assertTrue(this.exampleDoubleEdgePath.pathSteps().contains(exampleEdgeEndString2));
-
+		assertEquals(exampleEdgeStartString,this.exampleDoubleEdgePath.pathSteps().get(0));
+		assertEquals(exampleEdgeEndString,this.exampleDoubleEdgePath.pathSteps().get(1));
+		assertEquals(exampleEdgeEndString2,this.exampleDoubleEdgePath.pathSteps().get(2));
 	}
 	
-//	@Test 
-//	void testShortestPath() {
-//		
-//		/*
-//		 * Expects : 
-//		 * Wishka - Irmoupolis - Ziouxuan - Tetrov - Murat - Larti, cost of 33
-//		 * lowest cost path between Wishka and Larti
-//		 */
-//		
-//	}
-	// For shortest, might want to draw a graph....
+	@Test 
+	void testShortestPath() {	
+		MapGraph.MapPath exampleShortestPath = this.thisGraph.shortestPath(
+				expectedShortestPathSteps.get(0),
+				expectedShortestPathSteps.get(expectedShortestPathSteps.size()-1)
+				);
+		assertEquals(expectedShortestPathSteps, exampleShortestPath.pathSteps());
+		assertEquals(expectedShortestPathCost, exampleShortestPath.totalDistance());		
+		
+	}
 
+	
+	@Test 
+	void testShortestPathNoSolutionGivesEmptyPath() {	
+		MapGraph.MapPath exampleShortestPath = this.brokenGraph.shortestPath(
+				expectedShortestPathSteps.get(0),
+				expectedShortestPathSteps.get(expectedShortestPathSteps.size()-1)
+				);
+		assertTrue(exampleShortestPath.isEmpty());		
+	}
+
+	
 }
