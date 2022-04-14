@@ -1,18 +1,19 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.HashMap;
 
 import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.io.File;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -53,27 +54,63 @@ public class MapGraph {
 
 	}
 	
-//	/*
-//	 * Find shortest path from A to B using Dijkstra's algorithm. 
-//	 * If there are several solutions, doesn't make any promise about which one it will pick. 
-//	 */
-//	public MapPath shortestPath(String startPoint, String endPoint) {
-//		
-//		String x = new String(startPoint);
-//		String y = new String(endPoint);
-//		Set<String> visitedSet = new LinkedHashSet<String>();		
-//		PriorityQueue<MapPath> pathQueue = new PriorityQueue<MapPath>(100, new MapPathComparator());
-//		
-//		// fill the HashMap with the key/val for the start node, with 0 as distance
-//		// fill the rest with infinite vlaues 
-//		/*
-//		 * Pseudocode 
-//		 * 
-//		 * 
-//		 */
-//		return new MapPath();
-//	}
-//	
+	/*
+	 * Find shortest path from A to B using Dijkstra's algorithm. 
+	 * If there are several solutions, doesn't make any promise about which one it will pick. 
+	 * 
+	 * @return MapPath that is empty if there isn't any path leading to destination.
+	 */
+	public MapPath shortestPath(String startPoint, String endPoint) {
+		
+		String startNode = new String(startPoint);
+		String targetNode = new String(endPoint);
+		LinkedHashSet<String> visitedSet = new LinkedHashSet<String>();
+		PriorityQueue<MapPath> pathPriorityQueue = new PriorityQueue<MapPath>(100, new MapPathComparator());
+		
+		
+		// initialize : current node is start node, and add a path start -> start (0 distance) to the queue. 
+		MapPath startToItselfMapPath = new MapPath();
+		startToItselfMapPath.addEdge(new MapEdge(startNode, startNode, 0.));
+		pathPriorityQueue.add(startToItselfMapPath);
+		
+		
+		while(!pathPriorityQueue.isEmpty()) {
+			
+			MapPath bestMapPath = pathPriorityQueue.remove();
+			String bestPathDestinationNode = bestMapPath.endNode();
+			
+			
+			if(bestPathDestinationNode.equals(targetNode)) {
+				return bestMapPath;
+			}
+			
+			if (visitedSet.contains(bestPathDestinationNode)) {
+				continue;
+			}
+			
+			
+			for(Map.Entry<String, Set<Double>> childrenEntry: this.concreteGraphMap.listChildren(bestPathDestinationNode).entrySet()) {
+				Set<Double> childrenLabels = childrenEntry.getValue();
+				if (!childrenLabels.isEmpty()) {
+					if (!visitedSet.contains(childrenEntry.getKey())) {
+						Double minLabelForChildren = Collections.min(childrenLabels);
+						MapPath extendedMapPath = new MapGraph.MapPath(bestMapPath);
+						extendedMapPath.addEdge(new MapEdge(bestPathDestinationNode, childrenEntry.getKey(), minLabelForChildren));
+						pathPriorityQueue.add(extendedMapPath);							
+					}				
+				}
+			}
+			
+	
+			visitedSet.add(bestPathDestinationNode);
+	
+			
+		}
+		
+		return new MapGraph.MapPath();
+
+	}
+	
 	
 	/*
 	 * represents an edge between two spatial points in the graph, and the distance associated with it. 
@@ -121,6 +158,14 @@ public class MapGraph {
 		}
 		
 		/*
+		 * copy constructor
+		 */
+		public MapPath(MapPath otherMapPath) {
+			this.edges = new LinkedHashSet<MapEdge>(otherMapPath.edges);
+			this.totalDistance = Double.valueOf(otherMapPath.totalDistance());
+		}
+		
+		/*
 		 * Add a MapEdge in the set and update the total distance. 
 		 */
 		public void addEdge(MapEdge edge){
@@ -160,6 +205,14 @@ public class MapGraph {
 				return Double.valueOf(this.totalDistance);
 			}	
 		}
+		
+//		/*
+//		 * @return the set of nodes representing the steps of the path
+//		 * 
+//		 */
+//		public HashSet<String> pathSteps(){
+//			
+//		}
 		
 	}
 	

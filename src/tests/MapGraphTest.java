@@ -2,12 +2,12 @@ package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import main.MapGraph;
-import main.MapGraph.MapPath;
 
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -20,13 +20,26 @@ class MapGraphTest {
 	public String yamlFileString = "/Users/emile/Documents/shiny-graph/src/tests/testMapGraph.yaml";
 	public String exampleEdgeStartString = "start";
 	public String exampleEdgeEndString = "end";
+	public String exampleEdgeStartString2 = "other node start";
+	public String exampleEdgeEndString2 = "other node end";
 	public Double exampleEdgeDistanceDouble = 10.;
+	public Double exampleEdgeDistanceDouble2 = 20.;
+	public MapGraph.MapPath exampleSingleEdgePath;
+	public MapGraph.MapPath exampleDoubleEdgePath;
 	
 	@BeforeAll
 	void setUpBeforeClass() throws Exception {
 		thisGraph = new MapGraph("/Users/emile/Documents/shiny-graph/src/tests/testMapGraph.yaml");
+		
 	}
 
+	@BeforeEach
+	void setUpBeforeTests() throws Exception{
+		this.exampleSingleEdgePath = new MapGraph.MapPath();
+		this.exampleSingleEdgePath.addEdge(new MapGraph.MapEdge(exampleEdgeStartString, exampleEdgeEndString, exampleEdgeDistanceDouble));
+		this.exampleDoubleEdgePath = new MapGraph.MapPath(this.exampleSingleEdgePath);
+		this.exampleDoubleEdgePath.addEdge(new MapGraph.MapEdge(this.exampleEdgeStartString2, this.exampleEdgeEndString2, this.exampleEdgeDistanceDouble2));
+	}
 	
 	@Test
 	void testConstructor() {
@@ -49,35 +62,38 @@ class MapGraphTest {
 	
 	@Test
 	void testMapPath() {
-		MapGraph.MapPath thisPath = new MapGraph.MapPath();
-		thisPath.addEdge(new MapGraph.MapEdge(exampleEdgeStartString, exampleEdgeEndString, exampleEdgeDistanceDouble));
-		assertTrue(thisPath.totalDistance().equals(exampleEdgeDistanceDouble));
-		assertTrue(thisPath.startNode().equals(exampleEdgeStartString));
-		assertTrue(thisPath.endNode().equals(exampleEdgeEndString));
-		thisPath.addEdge(new MapGraph.MapEdge("other node start", "other node end", 20.));
-		assertTrue(thisPath.totalDistance().equals(exampleEdgeDistanceDouble + 20.));
-		assertTrue(thisPath.startNode().equals(exampleEdgeStartString));
-		assertTrue(thisPath.endNode().equals("other node end"));
+		assertTrue(exampleSingleEdgePath.totalDistance().equals(exampleEdgeDistanceDouble));
+		assertTrue(exampleSingleEdgePath.startNode().equals(exampleEdgeStartString));
+		assertTrue(exampleSingleEdgePath.endNode().equals(exampleEdgeEndString));
+		assertTrue(exampleDoubleEdgePath.totalDistance().equals(exampleEdgeDistanceDouble + 20.));
+		assertTrue(exampleDoubleEdgePath.startNode().equals(exampleEdgeStartString));
+		assertTrue(exampleDoubleEdgePath.endNode().equals(this.exampleEdgeEndString2));
 	}
 	
 	@Test 
 	void testMapPathComparator() {
-		MapGraph.MapPath thisPath = new MapGraph.MapPath();
-		thisPath.addEdge(new MapGraph.MapEdge(exampleEdgeStartString, exampleEdgeEndString, exampleEdgeDistanceDouble));
-		MapGraph.MapPath otherPath = new MapGraph.MapPath();
-		otherPath.addEdge(new MapGraph.MapEdge("other node start", "other node end", 20.));
-		MapGraph.MapPathComparator mapPathComparator = new MapGraph.MapPathComparator();
-		assertTrue(mapPathComparator.compare(otherPath, thisPath)>0);
+		assertTrue(new MapGraph.MapPathComparator().compare(this.exampleDoubleEdgePath, this.exampleSingleEdgePath)>0);
 	}
+	
+//	@Test 
+//	void testPathSteps() {
+//		HashSet<String> expectedSteps = new HashSet<String>();
+//		expectedSteps.add(exampleEdgeStartString);
+//		expectedSteps.add(exampleEdgeEndString);
+//		expectedSteps.add(exampleEdgeStartString2);
+//		expectedSteps.add(exampleEdgeEndString2);
+//		assertTrue(this.exampleDoubleEdgePath.pathSteps().containsAll(expectedSteps));
+//	}
 	
 //	@Test 
 //	void testShortestPath() {
 //		
 //		/*
 //		 * Expects : 
-//		 * Wishka - Marman - Panju - Etrios - Larti, cost of 40
+//		 * Wishka - Irmoupolis - Ziouxuan - Tetrov - Murat - Larti, cost of 33
 //		 * lowest cost path between Wishka and Larti
 //		 */
+//		
 //	}
 	// For shortest, might want to draw a graph....
 
