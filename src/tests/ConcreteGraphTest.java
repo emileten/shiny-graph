@@ -16,7 +16,7 @@ import main.ConcreteGraph;
 class ConcreteGraphTest {
 
 	
-	public ConcreteGraph thisGraph;
+	public ConcreteGraph<String, String> thisGraph;
 	public String testChildNode; 
 	public String testParentNode;
 	public String testEdgeLabel;
@@ -31,7 +31,7 @@ class ConcreteGraphTest {
 	// uses the constructor
 	@BeforeEach
 	void setUp() throws Exception {
-		thisGraph = new ConcreteGraph();
+		thisGraph = new ConcreteGraph<String, String>();
 	}
 	
 

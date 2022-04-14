@@ -6,24 +6,24 @@ import java.util.Map;
 
 /*
  * An AbstractGraph is a collection of nodes and edges. Nodes and edges are abstractions that are useful to model
- * a series of real world phenomena (cities with flight connections, social network users, etc...), and may have various 
- * software-level representations.
+ * various real world phenomena (cities with flight connections, social network users, etc...), and may be represented 
+ * (at the software level) in different ways. 
  * 
  *
- * An edge connects two nodes n1 and n2, so it can be written here <N1, N2>. An edge is directed : it starts from n1, 
+ * An edge connects two nodes n1 and n2. Let that edge be written <N1, N2>. An edge is 'directed' : it starts from n1, 
  * called the parent node of the edge, and ends in n2, called the child node of the edge. 
  * 
  * An edge can connect a given node to itself, e.g. <N1, N1>. 
  * 
- * n1 is called the parent node of N2 and, equivalently, N2 is called the child node of N1. A node may have any
+ * n1 is called the parent node of N2 and and, equivalently, N2 is called the child node of N1. A node may have any
  * number of children or parent nodes (it may also not be connected to any edge), 
  * therefore an AbstractGraph may have any number of nodes or edges. 
  * 
  * A path is a sequence of edges where an edge to some node is immediately followed by an edge starting from that node. It is written
  * <<N1, N2>, <N2, N3>.
  * 
- * An edge is labeled with a string, so it is associated with three data values : <N1, N2, l> where l is the label of that edge. 
- * A node is associated with its own string label that uniquely identifies it.
+ * An edge is labeled -- the label may be of any type -- so we can expand the notation above and write an arbitrary edge as <N1, N2, l> where l is the label of that edge. 
+ * A node is associated with its own label, of any type, that uniquely identifies it.
  * 
  * 
  * Specification fields:
@@ -40,7 +40,7 @@ import java.util.Map;
  * - for any N in the nodes field, nodes.N != null and for any edge E in the edges field, E.l != null
  * 
  */
-public interface AbstractGraph {
+public interface AbstractGraph<K,V> {
 
 	/*
 	 * notations : g corresponds to this graph.
@@ -62,7 +62,7 @@ public interface AbstractGraph {
 	 * @throws IllegalArgumentException if node already in g.nodes or node == null. 
 	 *
 	 */
-	void addNode(String node);
+	void addNode(K node);
 	
 	/*
 	 * @param node node to remove from g. 
@@ -73,7 +73,7 @@ public interface AbstractGraph {
 	 * @throws IllegalArgumentException if node not in g.nodes. 
 	 * 
 	 */
-	void removeNode(String node);
+	void removeNode(K node);
 	
 	/*
 	 * @param child the child node of the edge to add
@@ -88,7 +88,7 @@ public interface AbstractGraph {
 	 * @throws IllegalArgumentException if either of child, parent or label is null, or the edge defined by <child, parent, label>
 	 * is already contained in g. 
 	 */
-	void addEdge(String child, String parent, String label);
+	void addEdge(K child, K parent, V label);
 	
 	/*
 	 * @param child the child node of the edge to remove
@@ -100,7 +100,7 @@ public interface AbstractGraph {
 	 * 
 	 * @throws IllegalArgumentException if the edge is not contained in g. 
 	 */
-	void removeEdge(String child, String parent, String label);
+	void removeEdge(K child, K parent, V label);
 	
 		
 	
@@ -113,7 +113,7 @@ public interface AbstractGraph {
 	/*
 	 * @return g.nodes
 	 */
-	Set<String> listNodes();
+	Set<K> listNodes();
 	
 	/*
 	 * @param parent the parent node of which to fetch the children node
@@ -122,7 +122,7 @@ public interface AbstractGraph {
 	 * 
 	 * @throws IllegalArgumentException if parent does not belong to g.nodes. 
 	 */
-	Map<String, Set<String>> listChildren(String parent);
+	Map<K, Set<V>> listChildren(K parent);
 
 	/*
 	 * @param child the child node of which to fetch the parent nodes
@@ -131,7 +131,7 @@ public interface AbstractGraph {
 	 * 
 	 * @throws IllegalArgumentException if child does not belong to g.nodes. 
 	 */
-	Map<String, Set<String>> listParents(String child);
+	Map<K, Set<V>> listParents(K child);
 		
 	/*
 	 * @param child the child node of the edge from which to fetch the label
@@ -141,5 +141,5 @@ public interface AbstractGraph {
 	 * @throws IllegalArgumentException if g.nodes does not contain parent, or it does but there aren't any edges associating 
 	 * parent and child.
 	 */
-	Set<String> getEdgeLabels(String child, String parent);
+	Set<V> getEdgeLabels(K child, K parent);
 }
