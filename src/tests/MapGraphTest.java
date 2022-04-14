@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,6 @@ class MapGraphTest {
 	public String yamlFileString = "/Users/emile/Documents/shiny-graph/src/tests/testMapGraph.yaml";
 	public String exampleEdgeStartString = "start";
 	public String exampleEdgeEndString = "end";
-	public String exampleEdgeStartString2 = "other node start";
 	public String exampleEdgeEndString2 = "other node end";
 	public Double exampleEdgeDistanceDouble = 10.;
 	public Double exampleEdgeDistanceDouble2 = 20.;
@@ -36,9 +36,9 @@ class MapGraphTest {
 	@BeforeEach
 	void setUpBeforeTests() throws Exception{
 		this.exampleSingleEdgePath = new MapGraph.MapPath();
-		this.exampleSingleEdgePath.addEdge(new MapGraph.MapEdge(exampleEdgeStartString, exampleEdgeEndString, exampleEdgeDistanceDouble));
+		this.exampleSingleEdgePath.addEdge(new MapGraph.MapEdge(this.exampleEdgeStartString, this.exampleEdgeEndString, this.exampleEdgeDistanceDouble));
 		this.exampleDoubleEdgePath = new MapGraph.MapPath(this.exampleSingleEdgePath);
-		this.exampleDoubleEdgePath.addEdge(new MapGraph.MapEdge(this.exampleEdgeStartString2, this.exampleEdgeEndString2, this.exampleEdgeDistanceDouble2));
+		this.exampleDoubleEdgePath.addEdge(new MapGraph.MapEdge(this.exampleEdgeEndString, this.exampleEdgeEndString2, this.exampleEdgeDistanceDouble2));
 	}
 	
 	@Test
@@ -66,7 +66,6 @@ class MapGraphTest {
 		assertTrue(exampleSingleEdgePath.startNode().equals(exampleEdgeStartString));
 		assertTrue(exampleSingleEdgePath.endNode().equals(exampleEdgeEndString));
 		assertTrue(exampleDoubleEdgePath.totalDistance().equals(exampleEdgeDistanceDouble + 20.));
-		assertTrue(exampleDoubleEdgePath.startNode().equals(exampleEdgeStartString));
 		assertTrue(exampleDoubleEdgePath.endNode().equals(this.exampleEdgeEndString2));
 	}
 	
@@ -75,15 +74,15 @@ class MapGraphTest {
 		assertTrue(new MapGraph.MapPathComparator().compare(this.exampleDoubleEdgePath, this.exampleSingleEdgePath)>0);
 	}
 	
-//	@Test 
-//	void testPathSteps() {
-//		HashSet<String> expectedSteps = new HashSet<String>();
-//		expectedSteps.add(exampleEdgeStartString);
-//		expectedSteps.add(exampleEdgeEndString);
-//		expectedSteps.add(exampleEdgeStartString2);
-//		expectedSteps.add(exampleEdgeEndString2);
-//		assertTrue(this.exampleDoubleEdgePath.pathSteps().containsAll(expectedSteps));
-//	}
+	@Test 
+	void testPathSteps() {	
+		System.out.println(this.exampleDoubleEdgePath.pathSteps());
+		assertEquals(3, this.exampleDoubleEdgePath.pathSteps().size());
+		assertTrue(this.exampleDoubleEdgePath.pathSteps().contains(exampleEdgeStartString));
+		assertTrue(this.exampleDoubleEdgePath.pathSteps().contains(exampleEdgeEndString));
+		assertTrue(this.exampleDoubleEdgePath.pathSteps().contains(exampleEdgeEndString2));
+
+	}
 	
 //	@Test 
 //	void testShortestPath() {

@@ -5,10 +5,9 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import java.util.Comparator;
-import java.util.PriorityQueue;
 import java.util.HashSet;
+import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.HashMap;
 
 import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
@@ -206,13 +205,22 @@ public class MapGraph {
 			}	
 		}
 		
-//		/*
-//		 * @return the set of nodes representing the steps of the path
-//		 * 
-//		 */
-//		public HashSet<String> pathSteps(){
-//			
-//		}
+		/*
+		 * @return the set of nodes representing the steps of the path, in order of 
+		 * edges insertion.
+		 * 
+		 */
+		public LinkedHashSet<String> pathSteps(){
+			if (this.edges.isEmpty()) {
+				throw new RuntimeException("empty path");
+			}
+			LinkedHashSet<String> pathNodes = new LinkedHashSet<String>();
+			for (MapEdge edge: this.edges) {
+				pathNodes.add(edge.start);
+			}
+			pathNodes.add(this.endNode());
+			return pathNodes;
+		}
 		
 	}
 	
